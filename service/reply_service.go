@@ -20,23 +20,22 @@ type MsgReply struct {
 
 func ReplyHandler(w http.ResponseWriter, r *http.Request) {
 	log.Print("请求到了====")
-	data := MsgReply{}
+
 	decoder := json.NewDecoder(r.Body)
-	if err := decoder.Decode(&data); err != nil {
+	body := make(map[string]any)
+
+	if err := decoder.Decode(&body); err != nil {
 		fmt.Fprintf(w, "解析请求体失败")
 		return
 	}
-	if data.Action != "" {
-		w.Write([]byte("success"))
-		return
-	}
+	defer r.Body.Close()
 
-	reply := MsgReply{
-		ToUserName:   data.FromUserName,
-		FromUserName: data.ToUserName,
-		MsgType:      data.MsgType,
-		Content:      "狐狐是垫的",
-		CreateTime:   strconv.Itoa(int(time.Now().Unix())),
+	reply := map[string]any{
+		"ToUserName":   body["FromUserName"],
+		"FromUserName": body["ToUserName"],
+		"CreateTime":   strconv.Itoa(int(time.Now().Unix())),
+		"MsgType":      "text",
+		"Content":      "狐狐是垫的",
 	}
 
 	msg, err := json.Marshal(reply)
