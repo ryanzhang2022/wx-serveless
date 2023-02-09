@@ -64,6 +64,7 @@ func ReplyHandler(w http.ResponseWriter, r *http.Request) {
 
 	if strings.Contains(body.Content, "gpt") {
 		go fetchChatGptSend(body.Content, body.FromUserName)
+		w.Write([]byte("success"))
 	} else {
 		reply := map[string]interface{}{
 			"ToUserName":   body.FromUserName,
@@ -76,7 +77,6 @@ func ReplyHandler(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("content-type", "application/json")
 		w.Write(msg)
 	}
-
 }
 
 type SendReplyReq struct {
