@@ -14,6 +14,7 @@ type MsgReply struct {
 }
 
 func ReplyHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "请求入参:%+v", r.Host)
 	data := MsgReply{}
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&data); err != nil {
