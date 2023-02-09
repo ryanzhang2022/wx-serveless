@@ -27,16 +27,15 @@ func ReplyHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("success"))
 		return
 	}
-	res := &JsonResult{}
+
 	reply := MsgReply{
 		ToUserName:   data.FromUserName,
 		FromUserName: data.ToUserName,
 		MsgType:      data.MsgType,
 		Content:      "狐狐是垫的",
 	}
-	res.Data = reply
 
-	msg, err := json.Marshal(res)
+	msg, err := json.Marshal(reply)
 	if err != nil {
 		fmt.Fprint(w, "内部错误")
 		return
