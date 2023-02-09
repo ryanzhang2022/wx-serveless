@@ -146,6 +146,7 @@ func fetchChatGptSend(question string, toUser string, fromAppId string) {
 	}
 
 	respMap := map[string]interface{}{}
+	log.Println("=====url" + wxReplyApi + fromAppId)
 	if err := httpPost(wxReplyApi+fromAppId, send, &respMap); err != nil {
 		log.Print(err)
 		return
