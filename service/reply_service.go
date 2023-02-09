@@ -11,6 +11,7 @@ type MsgReply struct {
 	FromUserName string
 	MsgType      string
 	Content      string
+	Action       string `json:"action"`
 }
 
 func ReplyHandler(w http.ResponseWriter, r *http.Request) {
@@ -19,6 +20,10 @@ func ReplyHandler(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&data); err != nil {
 		fmt.Fprintf(w, "解析请求体失败")
+		return
+	}
+	if data.Action != "" {
+		w.Write([]byte("success"))
 		return
 	}
 	res := &JsonResult{}
