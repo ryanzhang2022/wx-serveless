@@ -53,6 +53,8 @@ type ReplyReq struct {
 func ReplyHandler(w http.ResponseWriter, r *http.Request) {
 	log.Print("请求到了e====")
 
+	fromAppId := r.Header.Get("x-wx-from-appid")
+
 	decoder := json.NewDecoder(r.Body)
 	body := &ReplyReq{}
 
@@ -63,7 +65,7 @@ func ReplyHandler(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	if strings.Contains(body.Content, "gpt") {
-		go fetchChatGptSend(body.Content, body.FromUserName)
+		go fetchChatGptSend(body.Content, body.FromUserName, fromAppId)
 		w.Write([]byte("success"))
 	} else {
 		reply := map[string]interface{}{
@@ -114,9 +116,9 @@ type ChatGptResp struct {
 	} `json:"usage"`
 }
 
-func fetchChatGptSend(question string, toUser string) {
+func fetchChatGptSend(question string, toUser string, fromAppId string) {
 	chatapi := "https://api.openai.com/v1/completions"
-	wxReplyApi := "http://api.weixin.qq.com/cgi-bin/message/custom/send"
+	wxReplyApi := "http://api.weixin.qq.com/cgi-bin/message/custom/send?from_appid="
 
 	gptReq := ChatGptReq{
 		Prompt:           question,
@@ -144,7 +146,7 @@ func fetchChatGptSend(question string, toUser string) {
 	}
 
 	respMap := map[string]interface{}{}
-	if err := httpPost(wxReplyApi, send, &respMap); err != nil {
+	if err := httpPost(wxReplyApi+fromAppId, send, &respMap); err != nil {
 		log.Print(err)
 		return
 	}

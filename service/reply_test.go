@@ -5,5 +5,5 @@ import (
 )
 
 func TestFetchChatGptSend(t *testing.T) {
-	fetchChatGptSend("tell me a joke", "")
+	fetchChatGptSend("tell me a joke", "", "")
 }
