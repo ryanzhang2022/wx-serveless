@@ -182,6 +182,7 @@ func httpPost(url string, req interface{}, resp interface{}) (err error) {
 	}
 	defer tempResp.Body.Close()
 
+	log.Printf("http-resp:%+v\n", respBody)
 	if err = json.Unmarshal(respBody, resp); err != nil {
 		log.Print(err)
 		return
