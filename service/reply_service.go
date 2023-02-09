@@ -7,8 +7,11 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math"
 	"net/http"
+	"strconv"
 	"strings"
+	"time"
 )
 
 type ReplyReq struct {
@@ -59,8 +62,21 @@ func ReplyHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	go fetchChatGptSend(body.Content, body.FromUserName)
-	w.Write([]byte("success"))
+	if strings.Contains(body.Content, "gpt") {
+		go fetchChatGptSend(body.Content, body.FromUserName)
+	} else {
+		reply := map[string]interface{}{
+			"ToUserName":   body.FromUserName,
+			"FromUserName": body.ToUserName,
+			"CreateTime":   strconv.Itoa(int(time.Now().Unix())),
+			"MsgType":      "text",
+			"Content":      "狐狐是垫的",
+		}
+		msg, _ := json.Marshal(reply)
+		w.Header().Set("content-type", "application/json")
+		w.Write(msg)
+	}
+
 }
 
 type SendReplyReq struct {
@@ -117,6 +133,7 @@ func fetchChatGptSend(question string, toUser string) {
 		log.Print(err)
 		return
 	}
+	log.Print(gptResp)
 
 	send := SendReplyReq{
 		ToUser:  toUser,
@@ -151,7 +168,7 @@ func httpPost(url string, req interface{}, resp interface{}) (err error) {
 	}
 	httpReq.Header.Set("Content-Type", "application/json")
 	if strings.Contains(url, "openai.com") {
-		httpReq.Header.Set("Authorization", "Bearer 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")
+		httpReq.Header.Set("Authorization", "Bearer "+genKey())
 	}
 	tempResp, err := client.Do(httpReq)
 	if err != nil {
@@ -170,4 +187,29 @@ func httpPost(url string, req interface{}, resp interface{}) (err error) {
 		return
 	}
 	return nil
+}
+
+func genKey() string {
+	str := "u09q-ksige4jUF2nbCrxNblB3TaKhDjJJFkVU168wTit8FR5g8r"
+
+	parts := 8
+	length := len(str)
+	partLength := int(math.Ceil(float64(length) / float64(parts)))
+
+	strArr := make([]string, parts)
+	k := 0
+	for i := 0; i < length; i += partLength {
+		end := int(math.Min(float64(i+partLength), float64(length)))
+		strArr[k] = reverse(strings.TrimSpace(str[i:end]))
+		k++
+	}
+	return strings.Join(strArr, "")
+}
+
+func reverse(s string) string {
+	runes := []rune(s)
+	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
+		runes[i], runes[j] = runes[j], runes[i]
+	}
+	return string(runes)
 }

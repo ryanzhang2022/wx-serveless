@@ -1,6 +1,8 @@
 package service
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestFetchChatGptSend(t *testing.T) {
 	fetchChatGptSend("tell me a joke", "")
