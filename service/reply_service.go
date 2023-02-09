@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
+	"time"
 )
 
 type MsgReply struct {
@@ -12,6 +14,7 @@ type MsgReply struct {
 	FromUserName string
 	MsgType      string
 	Content      string
+	CreateTime   string
 	Action       string `json:"action"`
 }
 
@@ -33,6 +36,7 @@ func ReplyHandler(w http.ResponseWriter, r *http.Request) {
 		FromUserName: data.ToUserName,
 		MsgType:      data.MsgType,
 		Content:      "狐狐是垫的",
+		CreateTime:   strconv.Itoa(int(time.Now().Unix())),
 	}
 
 	msg, err := json.Marshal(reply)
