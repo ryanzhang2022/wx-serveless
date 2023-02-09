@@ -9,20 +9,11 @@ import (
 	"time"
 )
 
-type MsgReply struct {
-	ToUserName   string
-	FromUserName string
-	MsgType      string
-	Content      string
-	CreateTime   string
-	Action       string `json:"action"`
-}
-
 func ReplyHandler(w http.ResponseWriter, r *http.Request) {
 	log.Print("请求到了====")
 
 	decoder := json.NewDecoder(r.Body)
-	body := make(map[string]any)
+	body := make(map[string]interface{})
 
 	if err := decoder.Decode(&body); err != nil {
 		fmt.Fprintf(w, "解析请求体失败")
@@ -30,7 +21,7 @@ func ReplyHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	reply := map[string]any{
+	reply := map[string]interface{}{
 		"ToUserName":   body["FromUserName"],
 		"FromUserName": body["ToUserName"],
 		"CreateTime":   strconv.Itoa(int(time.Now().Unix())),
